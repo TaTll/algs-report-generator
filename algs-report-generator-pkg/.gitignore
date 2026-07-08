@@ -1,0 +1,8 @@
+data/*.csv
+data/*.html
+data/*.pdf
+data/*.jpg
+data/radar_charts/
+.env
+__pycache__/
+*.pyc

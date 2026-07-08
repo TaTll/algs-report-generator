@@ -1,0 +1,26 @@
+# Generated data
+data/
+
+# Node modules
+public/node_modules/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Temp
+_std*
+*.tmp
+_fetch_temp.html
+
+# IDE
+.vscode/
+.idea/
+
+# Secrets
+scripts/.feishu_config
+
+# OS
+.DS_Store
+Thumbs.db
+public/radar_charts/
