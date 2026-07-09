@@ -92,36 +92,33 @@ function renderPanel(g){
   h+='<div class="stat-box"><div class="num">'+d.team_count+'</div><div class="lbl">Teams</div></div>';
   h+='<div class="stat-box"><div class="num">'+d.groups.join(" vs ")+'</div><div class="lbl">Groups</div></div></div>';
   h+='<div class="view-bar">';
-  h+='<button class="view-btn'+(currentView==="teams"?" active":"")+'" id="btn-teams">Team Data</button>';
-  h+='<button class="view-btn'+(currentView==="players"?" active":"")+'" id="btn-players">Player Data</button></div>';
+  h+='<button class="view-btn'+(currentView==="teams"?" active":"")+'" onclick="currentView=\'teams\';renderPanel(\''+g+'\');">Team Data</button>';
+  h+='<button class="view-btn'+(currentView==="players"?" active":"")+'" onclick="currentView=\'players\';renderPanel(\''+g+'\');">Player Data</button></div>';
   
   // Teams
-  h+='<div class="view-panel'+(currentView==="teams"?" active":"")+'" id="view-teams"><div class="table-wrap"><table><thead><tr><th>#</th><th>Team</th><th>G</th><th>Kills</th><th>Damage</th><th></th></tr></thead><tbody>';
+  h+='<div class="view-panel'+(currentView==="teams"?" active":"")+'" id="view-teams-'+g+'"><div class="table-wrap"><table><thead><tr><th>#</th><th>Team</th><th>G</th><th>Kills</th><th>Damage</th><th></th></tr></thead><tbody>';
   var mk=d.teams[0]?d.teams[0].kills:1;
   d.teams.forEach(function(t,i){h+='<tr><td>'+(i+1)+'</td><td><strong>'+t.name+'</strong></td><td>'+t.group+'</td><td>'+t.kills+'</td><td>'+t.dmg.toLocaleString()+'</td><td><span class="bar-wrap"><span class="bar-fill" style="width:'+(t.kills/mk*100)+'%"></span></span></td></tr>';});
   h+='</tbody></table></div></div>';
 
   // Players
-  h+='<div class="view-panel'+(currentView==="players"?" active":"")+'" id="view-players">';
+  h+='<div class="view-panel'+(currentView==="players"?" active":"")+'" id="view-players-'+g+'">';
   h+='<div class="sub-bar">';
-  h+='<button class="view-btn'+(playerMode==="list"?" active":"")+'" id="btn-list">List</button>';
-  h+='<button class="view-btn'+(playerMode==="radar"?" active":"")+'" id="btn-radar">Radar Charts</button></div>';
+  h+='<button class="view-btn'+(playerMode==="list"?" active":"")+'" onclick="playerMode=\'list\';renderPanel(\''+g+'\');">List</button>';
+  h+='<button class="view-btn'+(playerMode==="radar"?" active":"")+'" onclick="playerMode=\'radar\';renderPanel(\''+g+'\');">Radar Charts</button></div>';
   
   // List
-  h+='<div class="view-panel'+(playerMode==="list"?" active":"")+'" id="pmode-list"><div class="table-wrap"><table><thead><tr><th>#</th><th>Player</th><th>Team</th><th>K</th><th>A</th><th>Dmg</th><th>K/D</th><th>KA/D</th><th>KP%</th></tr></thead><tbody>';
+  h+='<div class="view-panel'+(playerMode==="list"?" active":"")+'" id="pmode-list-'+g+'"><div class="table-wrap"><table><thead><tr><th>#</th><th>Player</th><th>Team</th><th>K</th><th>A</th><th>Dmg</th><th>K/D</th><th>KA/D</th><th>KP%</th></tr></thead><tbody>';
   d.players.forEach(function(p,i){h+='<tr class="player-row" onclick="showDetail(\''+g+'\','+i+')"><td>'+(i+1)+'</td><td><strong>'+p.name+'</strong></td><td>'+p.team+'</td><td>'+p.kills+'</td><td>'+p.assists+'</td><td>'+p.dmg+'</td><td>'+p.kd+'</td><td>'+p.kad+'</td><td>'+p.kp+'%</td></tr>';});
   h+='</tbody></table></div></div>';
 
   // Radar grid
-  h+='<div class="view-panel'+(playerMode==="radar"?" active":"")+'" id="pmode-radar"><div class="radar-grid">';
+  h+='<div class="view-panel'+(playerMode==="radar"?" active":"")+'" id="pmode-radar-'+g+'"><div class="radar-grid">';
   d.players.forEach(function(p,i){if(p.thumb)h+='<div class="radar-card" onclick="showDetail(\''+g+'\','+i+')"><img src="'+p.thumb+'" alt="'+p.name+'" loading="lazy"><div class="rname">'+p.name+'</div><div class="rteam">'+p.team+'</div></div>';});
   h+='</div></div></div>';
 
   panel.innerHTML=h;
-  document.getElementById("btn-teams").onclick=function(){currentView="teams";renderPanel(g);};
-  document.getElementById("btn-players").onclick=function(){currentView="players";renderPanel(g);};
-  try{document.getElementById("btn-list").onclick=function(){playerMode="list";renderPanel(g);};}catch(e){}
-  try{document.getElementById("btn-radar").onclick=function(){playerMode="radar";renderPanel(g);};}catch(e){}
+
 }
 
 function showDetail(g,idx){
