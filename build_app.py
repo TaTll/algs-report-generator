@@ -22,7 +22,7 @@ sys.path.insert(0, SCRIPTS_DIR)
 from team_utils import find_player_photo, get_team_abbr
 from PIL import Image
 
-GROUPS = {"ab": "Day1 A vs B", "ac": "Day2 A vs C", "bd": "Day2 B vs D"}
+GROUPS = {"ab": "Day1 A vs B", "ac": "Day2 A vs C", "bd": "Day2 B vs D", "bc": "Day3 B vs C", "ad": "Day3 A vs D"}
 
 all_data = {}
 for g, label in GROUPS.items():
