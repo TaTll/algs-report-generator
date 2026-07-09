@@ -92,8 +92,8 @@ function renderPanel(g){
   h+='<div class="stat-box"><div class="num">'+d.team_count+'</div><div class="lbl">Teams</div></div>';
   h+='<div class="stat-box"><div class="num">'+d.groups.join(" vs ")+'</div><div class="lbl">Groups</div></div></div>';
   h+='<div class="view-bar">';
-  h+='<button class="view-btn'+(currentView==="teams"?" active":"")+'" onclick="currentView=\'teams\';renderPanel(\''+g+'\');">Team Data</button>';
-  h+='<button class="view-btn'+(currentView==="players"?" active":"")+'" onclick="currentView=\'players\';renderPanel(\''+g+'\');">Player Data</button></div>';
+  h+='<button class="view-btn'+(currentView==="teams"?" active":"")+'" onclick="switchView(\'teams\',\''+g+'\')">Team Data</button>';
+  h+='<button class="view-btn'+(currentView==="players"?" active":"")+'" onclick="switchView(\'players\',\''+g+'\')">Player Data</button></div>';
   
   // Teams
   h+='<div class="view-panel'+(currentView==="teams"?" active":"")+'" id="view-teams-'+g+'"><div class="table-wrap"><table><thead><tr><th>#</th><th>Team</th><th>G</th><th>Kills</th><th>Damage</th><th></th></tr></thead><tbody>';
@@ -104,8 +104,8 @@ function renderPanel(g){
   // Players
   h+='<div class="view-panel'+(currentView==="players"?" active":"")+'" id="view-players-'+g+'">';
   h+='<div class="sub-bar">';
-  h+='<button class="view-btn'+(playerMode==="list"?" active":"")+'" onclick="playerMode=\'list\';renderPanel(\''+g+'\');">List</button>';
-  h+='<button class="view-btn'+(playerMode==="radar"?" active":"")+'" onclick="playerMode=\'radar\';renderPanel(\''+g+'\');">Radar Charts</button></div>';
+  h+='<button class="view-btn'+(playerMode==="list"?" active":"")+'" onclick="switchPlayerMode(\'list\',\''+g+'\')">List</button>';
+  h+='<button class="view-btn'+(playerMode==="radar"?" active":"")+'" onclick="switchPlayerMode(\'radar\',\''+g+'\')">Radar Charts</button></div>';
   
   // List
   h+='<div class="view-panel'+(playerMode==="list"?" active":"")+'" id="pmode-list-'+g+'"><div class="table-wrap"><table><thead><tr><th>#</th><th>Player</th><th>Team</th><th>K</th><th>A</th><th>Dmg</th><th>K/D</th><th>KA/D</th><th>KP%</th></tr></thead><tbody>';
@@ -134,6 +134,9 @@ function showDetail(g,idx){
 }
 function hideModal(){document.getElementById("modal").classList.remove("active");}
 document.addEventListener("keydown",function(e){if(e.key==="Escape")hideModal();});
+
+function switchView(v,g){currentView=v;renderPanel(g);}
+function switchPlayerMode(m,g){playerMode=m;renderPanel(g);}
 </script>
 </body>
 </html>
