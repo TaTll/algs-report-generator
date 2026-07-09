@@ -79,3 +79,40 @@ pip install "scrapling[all]>=0.4.10" beautifulsoup4 matplotlib pillow requests
 - 需要 `scrapling install --force` 安装浏览器依赖
 - 选手照片需预先爬取到 `data/picture-ab/`
 - 不再需要 fpdf2（已取消 PDF 输出）
+
+## 🎬 剪映工程生成
+
+将雷达图 + 选手照片 + 战队Logo 导入剪映时间轴，自动创建三轨道视频工程：
+
+```bash
+cd scripts
+
+# 生成 AC 组剪映工程
+python build_jy_video.py --group ac
+
+# 指定草稿名称和图片时长
+python build_jy_video.py --group bd --name "ALGS_BD_Showcase" --duration 4s
+```
+
+| 参数 | 说明 |
+|------|------|
+| `--group ac` | 组别（对应 `data/{group}/` 目录） |
+| `--name` | 草稿名称（默认 `ALGS_{GROUP}_Group`） |
+| `--duration` | 每张图显示时长（默认 `3s`） |
+
+### 时间轴结构
+
+| 轨道 | 内容 |
+|------|------|
+| **Radar**（上层） | 六边形雷达图 + 选手名字幕 |
+| **Photo**（中层） | 选手照片 |
+| **Logo**（下层） | 战队Logo |
+
+同一选手的三张图**同时出现**，时长统一，按战队排序依次播放。
+
+### 前提条件
+
+- 已安装 [jianying-editor](https://github.com/GuanYixuan/pyJianYingDraft) Skill
+- 已生成对应组别的雷达图（运行过 `generate_report.py --group xx`）
+- 已爬取选手照片到 `data/picture-ab/`
+- 剪映运行时不要锁定草稿文件夹
