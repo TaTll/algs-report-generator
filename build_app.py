@@ -55,9 +55,10 @@ for g, label in GROUPS.items():
         if os.path.exists(radar_path):
             try:
                 img = Image.open(radar_path)
-                img.thumbnail((300, 300), Image.LANCZOS)
+                img = img.convert("RGB")
+                img.thumbnail((100, 100), Image.LANCZOS)
                 buf = io.BytesIO()
-                img.save(buf, "PNG")
+                img.save(buf, "JPEG", quality=60)
                 radar_b64 = base64.b64encode(buf.getvalue()).decode()
             except:
                 pass
@@ -68,9 +69,9 @@ for g, label in GROUPS.items():
         if photo_path:
             try:
                 img = Image.open(photo_path)
-                img.thumbnail((160, 160), Image.LANCZOS)
+                img.thumbnail((80, 80), Image.LANCZOS)
                 buf = io.BytesIO()
-                img.save(buf, "PNG")
+                img.save(buf, "JPEG", quality=50)
                 photo_b64 = base64.b64encode(buf.getvalue()).decode()
             except:
                 pass
@@ -282,7 +283,7 @@ function renderPanel(g) {
   d.players.forEach(function(p, i) {
     if (p.radar_b64) {
       html += '<div class="radar-card" onclick="showPlayerDetail(\'' + g + '\',' + i + ')">';
-      html += '<img src="data:image/png;base64,' + p.radar_b64 + '" alt="' + p.name + '" loading="lazy">';
+      html += '<img src="data:image/jpeg;base64,' + p.radar_b64 + '" alt="' + p.name + '" loading="lazy">';
       html += '<div class="rname">' + p.name + '</div>';
       html += '<div class="rteam">' + p.team + '</div>';
       html += '</div>';
@@ -319,11 +320,11 @@ function showPlayerDetail(g, idx) {
   var html = '<div class="modal-header">';
   // Radar
   if (p.radar_b64) {
-    html += '<img class="modal-radar" src="data:image/png;base64,' + p.radar_b64 + '">';
+    html += '<img class="modal-radar" src="data:image/jpeg;base64,' + p.radar_b64 + '">';
   }
   // Photo
   if (p.photo_b64) {
-    html += '<img class="modal-photo" src="data:image/png;base64,' + p.photo_b64 + '">';
+    html += '<img class="modal-photo" src="data:image/jpeg;base64,' + p.photo_b64 + '">';
   }
   html += '<div class="modal-title">';
   html += '<h2>' + p.name + '</h2>';
