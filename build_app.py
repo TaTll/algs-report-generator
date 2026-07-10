@@ -11,7 +11,7 @@ import os, csv, json, re, io, sys, shutil
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
-PUBLIC_DIR = os.path.join(BASE_DIR, "public")
+PUBLIC_DIR = os.path.join(BASE_DIR, "docs")
 SCRIPTS_DIR = os.path.join(BASE_DIR, "scripts")
 THUMBS_DIR = os.path.join(PUBLIC_DIR, "thumbs")
 PHOTOS_DIR = os.path.join(PUBLIC_DIR, "photos")
