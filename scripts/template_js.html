@@ -105,7 +105,7 @@ function renderPanel(g){
 
   if(g!=="all"){
     h+='<div class="view-panel'+(playerMode==="radar"?" active":"")+'" id="pm-radar-'+g+'"><div class="radar-grid">';
-    d.players.forEach(function(p,i){if(p.thumb)h+='<div class="radar-card" onclick="showDetail('+JSON.stringify(g)+','+i+')"><img src="'+p.thumb+'" alt="'+p.name+'" loading="lazy"><div class="rname">'+p.name+'</div><div class="rteam">'+p.team+'</div></div>';});
+    d.players.forEach(function(p,i){if(p.thumb)h+='<div class="radar-card" onclick="showDetail('+JSON.stringify(g)+','+i+')"><img src="'+p.thumb+'?v=652038" alt="'+p.name+'" loading="lazy"><div class="rname">'+p.name+'</div><div class="rteam">'+p.team+'</div></div>';});
     h+='</div></div>';
   }
   panel.innerHTML=h;
@@ -113,7 +113,7 @@ function renderPanel(g){
   var br=document.getElementById("btn-radar-"+g);if(br)br.onclick=function(){playerMode="radar";renderPanel(g);};
 }
 
-function showDetail(g,idx){var p=DATA[g].players[idx],h='<div class="modal-header">';if(p.thumb)h+='<img class="modal-radar" src="'+p.thumb+'">';if(p.photo)h+='<img class="modal-photo" src="'+p.photo+'">';h+='<div class="modal-title"><h2>'+p.name+'</h2><div class="team">'+p.team+'</div></div></div><div class="modal-stats">';var kd=p.kd||p.avg_kd||0,kad=p.kad||p.avg_kad||0,kp=p.kp||p.avg_kp||0;[["Kills",p.kills,1],["Assists",p.assists,1],["Damage",p.dmg,1],["K/D",kd,1],["KA/D",kad,1],["KP%",kp+"%",0],["Games",p.games,0]].forEach(function(s){h+='<div class="modal-stat"><div class="label">'+s[0]+'</div><div class="value'+(s[2]?' hl':'')+'">'+s[1]+'</div></div>';});h+='</div>';document.getElementById("modal-content").innerHTML=h;document.getElementById("modal").classList.add("active");}
+function showDetail(g,idx){var p=DATA[g].players[idx],h='<div class="modal-header">';if(p.thumb)h+='<img class="modal-radar" src="'+p.thumb+'?v=652038">';if(p.photo)h+='<img class="modal-photo" src="'+p.photo+'?v=652038">';h+='<div class="modal-title"><h2>'+p.name+'</h2><div class="team">'+p.team+'</div></div></div><div class="modal-stats">';var kd=p.kd||p.avg_kd||0,kad=p.kad||p.avg_kad||0,kp=p.kp||p.avg_kp||0;[["Kills",p.kills,1],["Assists",p.assists,1],["Damage",p.dmg,1],["K/D",kd,1],["KA/D",kad,1],["KP%",kp+"%",0],["Games",p.games,0]].forEach(function(s){h+='<div class="modal-stat"><div class="label">'+s[0]+'</div><div class="value'+(s[2]?' hl':'')+'">'+s[1]+'</div></div>';});h+='</div>';document.getElementById("modal-content").innerHTML=h;document.getElementById("modal").classList.add("active");}
 function hideModal(){document.getElementById("modal").classList.remove("active");}
 document.addEventListener("keydown",function(e){if(e.key==="Escape")hideModal();});
 </script>
