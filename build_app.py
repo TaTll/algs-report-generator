@@ -24,6 +24,8 @@ from PIL import Image
 
 GROUPS = {"ab": "Day1 A vs B", "ac": "Day2 A vs C", "bd": "Day2 B vs D", "bc": "Day3 B vs C", "ad": "Day3 A vs D", "cd": "Day1 C vs D"}
 
+
+
 all_data = {}
 for g, label in GROUPS.items():
     csv_path = os.path.join(DATA_DIR, g, "algs_players_data.csv")
@@ -104,6 +106,54 @@ for g, label in GROUPS.items():
     }
     print(f"{g}: {len(rows)} players, {sum(1 for p in players if p['thumb'])} radars, {sum(1 for p in players if p['photo'])} photos")
 
+
+
+# ====== Overall Standings ======
+all_data["overall"] = {
+    "label": "Overall Standings",
+    "player_count": 40, "team_count": 40, "groups": ["All"], "teams": [], "players": [],
+    "standings": [{"rank":1,"team":"ELITE Esports","group":"C","score":199,"status":"Finals"},
+        {"rank":2,"team":"Team Liquid","group":"D","score":182,"status":"Finals"},
+        {"rank":3,"team":"S8UL","group":"D","score":161,"status":"Finals"},
+        {"rank":4,"team":"Team Vision","group":"D","score":139,"status":"Finals"},
+        {"rank":5,"team":"GaiminGladiators","group":"A","score":139,"status":"Finals"},
+        {"rank":6,"team":"ZETA DIVISION","group":"A","score":137,"status":"Finals"},
+        {"rank":7,"team":"AG GLOBAL","group":"A","score":134,"status":"Finals"},
+        {"rank":8,"team":"REJECT","group":"C","score":128,"status":"Finals"},
+        {"rank":9,"team":"ZEDI ESPORTS","group":"A","score":127,"status":"Finals"},
+        {"rank":10,"team":"Team Falcons","group":"B","score":120,"status":"Finals"},
+        {"rank":11,"team":"Team Nemesis","group":"C","score":116,"status":"Finals"},
+        {"rank":12,"team":"Sentinels","group":"C","score":116,"status":"Finals"},
+        {"rank":13,"team":"Alliance","group":"C","score":108,"status":"Finals"},
+        {"rank":14,"team":"UNLIMIT","group":"B","score":106,"status":"Finals"},
+        {"rank":15,"team":"Virtus.pro","group":"B","score":106,"status":"Survivor"},
+        {"rank":16,"team":"Wolves Esports","group":"B","score":105,"status":"Survivor"},
+        {"rank":17,"team":"Team RRQ","group":"C","score":104,"status":"Survivor"},
+        {"rank":18,"team":"NinjasinPyjamas","group":"C","score":104,"status":"Survivor"},
+        {"rank":19,"team":"VK GAMING","group":"C","score":102,"status":"Survivor"},
+        {"rank":20,"team":"ForFun Esports","group":"A","score":101,"status":"Survivor"},
+        {"rank":21,"team":"ShopifyRebellion","group":"B","score":101,"status":"Survivor"},
+        {"rank":22,"team":"KINOTROPE CLUB","group":"C","score":101,"status":"Survivor"},
+        {"rank":23,"team":"DINOS","group":"D","score":99,"status":"Survivor"},
+        {"rank":24,"team":"JD GAMING","group":"A","score":97,"status":"Survivor"},
+        {"rank":25,"team":"ZIPLINE MAFIA","group":"D","score":92,"status":"Survivor"},
+        {"rank":26,"team":"PXX","group":"A","score":90,"status":"Survivor"},
+        {"rank":27,"team":"Geekay Esports","group":"C","score":84,"status":"Survivor"},
+        {"rank":28,"team":"FLAT","group":"B","score":83,"status":"Survivor"},
+        {"rank":29,"team":"ENTER FORCE.36","group":"D","score":81,"status":"Survivor"},
+        {"rank":30,"team":"TIE","group":"A","score":80,"status":"Survivor"},
+        {"rank":31,"team":"WGR NEO","group":"D","score":74,"status":"Survivor"},
+        {"rank":32,"team":"GenG Esports","group":"B","score":74,"status":"Survivor"},
+        {"rank":33,"team":"AURORA","group":"D","score":70,"status":"Survivor"},
+        {"rank":34,"team":"Relove DCG","group":"A","score":70,"status":"Survivor"},
+        {"rank":35,"team":"Kirisame Havoc","group":"B","score":67,"status":"Eliminated"},
+        {"rank":36,"team":"TEAM HERETICS","group":"B","score":66,"status":"Eliminated"},
+        {"rank":37,"team":"Dogred","group":"D","score":66,"status":"Eliminated"},
+        {"rank":38,"team":"TLN Pirates","group":"D","score":61,"status":"Eliminated"},
+        {"rank":39,"team":"Dory","group":"B","score":43,"status":"Eliminated"},
+        {"rank":40,"team":"TriniTY","group":"A","score":31,"status":"Eliminated"},
+    ],
+}
 json_str = json.dumps(all_data, ensure_ascii=False)
 
 # ====== HTML ======
@@ -180,7 +230,7 @@ var playerMode = "list";
 
 (function init(){
   var tabs=document.getElementById("tabs"), content=document.getElementById("content");
-  Object.keys(DATA).forEach(function(g){
+  var keys=Object.keys(DATA); keys.sort(function(a,b){return a==="overall"?-1:b==="overall"?1:0}); keys.forEach(function(g){
     var btn=document.createElement("button");btn.className="tab-btn";btn.textContent=DATA[g].label;
     btn.onclick=function(){switchGroup(g);};tabs.appendChild(btn);
     var p=document.createElement("div");p.className="tab-panel";p.id="panel-"+g;content.appendChild(p);
@@ -196,6 +246,23 @@ function switchGroup(g){
 
 function renderPanel(g){
   var d=DATA[g], panel=document.getElementById("panel-"+g), h="";
+
+  // Special: Overall standings
+  if(g==="overall"){
+    h+='<div class="stats-bar"><div class="stat-box"><div class="num">'+d.team_count+'</div><div class="lbl">Teams</div></div>';
+    h+='<div class="stat-box"><div class="num">14</div><div class="lbl">To Finals</div></div>';
+    h+='<div class="stat-box"><div class="num">20</div><div class="lbl">To Survivor</div></div>';
+    h+='<div class="stat-box"><div class="num">6</div><div class="lbl">Eliminated</div></div></div>';
+    h+='<div class="table-wrap"><table><thead><tr><th>#</th><th>Team</th><th>Group</th><th>Score</th><th>Status</th></tr></thead><tbody>';
+    d.standings.forEach(function(s){
+      var color=s.status==="Finals"?"#00ff88":s.status==="Survivor"?"#ffd700":"#ff4444";
+      h+='<tr><td>'+s.rank+'</td><td><strong>'+s.team+'</strong></td><td>G'+s.group+'</td><td><strong>'+s.score+'</strong></td>';
+      h+='<td style="color:'+color+'">'+s.status+'</td></tr>';
+    });
+    h+='</tbody></table></div>';
+    panel.innerHTML=h;
+    return;
+  }
   h+='<div class="stats-bar">';
   h+='<div class="stat-box"><div class="num">'+d.player_count+'</div><div class="lbl">Players</div></div>';
   h+='<div class="stat-box"><div class="num">'+d.team_count+'</div><div class="lbl">Teams</div></div>';
