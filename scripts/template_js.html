@@ -7,13 +7,13 @@ var GROUP_LABELS = {"ab":"Day1 A vs B","ac":"Day2 A vs C","ad":"Day3 A vs D","bc
 
 (function init(){
   var tabs=document.getElementById("tabs"), subtabs=document.getElementById("subtabs"), content=document.getElementById("content");
-  addTab("overall","Overall Standings");
-  addTab("all","All Players");
-  addTab("group","Group Stage");
+  addTab("overall");
+  addTab("all");
+  addTab("group");
 
-  // Sub-tabs for group stage
+  // Sub-tabs
   GROUPS.forEach(function(g){
-    var b=document.createElement("button");b.className="tab-btn";b.textContent=GROUP_LABELS[g];
+    var b=document.createElement("button");b.className="tab-btn sub-item";b.textContent=GROUP_LABELS[g];
     b.onclick=function(){switchGroup(g);};
     subtabs.appendChild(b);
   });
@@ -24,7 +24,8 @@ var GROUP_LABELS = {"ab":"Day1 A vs B","ac":"Day2 A vs C","ad":"Day3 A vs D","bc
   switchGroup("overall");
 })();
 
-function addTab(g,label){
+function addTab(g){
+  var label=g==='group'?'Group Stage':DATA[g].label;
   var btn=document.createElement("button");btn.className="tab-btn";btn.textContent=label;
   btn.onclick=function(){switchGroup(g);};
   document.getElementById("tabs").appendChild(btn);
@@ -33,11 +34,20 @@ function addTab(g,label){
 function switchGroup(g){
   currentGroup=g;
   var isGroup=GROUPS.indexOf(g)>=0;
-  document.getElementById("subtabs").style.display=isGroup?"flex":"none";
+  var subtabs=document.getElementById("subtabs");
+  
+  // Show/hide sub-tabs
+  if(g==="group"){
+    subtabs.style.display="flex";
+    switchGroup(GROUPS[0]);
+    return;
+  }
+  subtabs.style.display=isGroup?"flex":"none";
+
   // Highlight top tab
+  var topLabel=isGroup?"Group Stage":DATA[g].label;
   document.querySelector("#tabs").querySelectorAll(".tab-btn").forEach(function(b){
-    var isActive=(b.textContent===DATA[g].label)||(isGroup&&b.textContent==="Group Stage");
-    b.classList.toggle("active",isActive);
+    b.classList.toggle("active",b.textContent===topLabel);
   });
   // Highlight sub tab
   if(isGroup){
@@ -103,20 +113,7 @@ function renderPanel(g){
   var br=document.getElementById("btn-radar-"+g);if(br)br.onclick=function(){playerMode="radar";renderPanel(g);};
 }
 
-function showDetail(g,idx){
-  var p=DATA[g].players[idx], h='<div class="modal-header">';
-  if(p.thumb)h+='<img class="modal-radar" src="'+p.thumb+'">';
-  if(p.photo)h+='<img class="modal-photo" src="'+p.photo+'">';
-  h+='<div class="modal-title"><h2>'+p.name+'</h2><div class="team">'+p.team+'</div></div></div>';
-  h+='<div class="modal-stats">';
-  var kd=p.kd||p.avg_kd||0,kad=p.kad||p.avg_kad||0,kp=p.kp||p.avg_kp||0;
-  [["Kills",p.kills,1],["Assists",p.assists,1],["Damage",p.dmg,1],["K/D",kd,1],["KA/D",kad,1],["KP%",kp+"%",0],["Games",p.games,0]].forEach(function(s){
-    h+='<div class="modal-stat"><div class="label">'+s[0]+'</div><div class="value'+(s[2]?' hl':'')+'">'+s[1]+'</div></div>';
-  });
-  h+='</div>';
-  document.getElementById("modal-content").innerHTML=h;
-  document.getElementById("modal").classList.add("active");
-}
+function showDetail(g,idx){var p=DATA[g].players[idx],h='<div class="modal-header">';if(p.thumb)h+='<img class="modal-radar" src="'+p.thumb+'">';if(p.photo)h+='<img class="modal-photo" src="'+p.photo+'">';h+='<div class="modal-title"><h2>'+p.name+'</h2><div class="team">'+p.team+'</div></div></div><div class="modal-stats">';var kd=p.kd||p.avg_kd||0,kad=p.kad||p.avg_kad||0,kp=p.kp||p.avg_kp||0;[["Kills",p.kills,1],["Assists",p.assists,1],["Damage",p.dmg,1],["K/D",kd,1],["KA/D",kad,1],["KP%",kp+"%",0],["Games",p.games,0]].forEach(function(s){h+='<div class="modal-stat"><div class="label">'+s[0]+'</div><div class="value'+(s[2]?' hl':'')+'">'+s[1]+'</div></div>';});h+='</div>';document.getElementById("modal-content").innerHTML=h;document.getElementById("modal").classList.add("active");}
 function hideModal(){document.getElementById("modal").classList.remove("active");}
 document.addEventListener("keydown",function(e){if(e.key==="Escape")hideModal();});
 </script>
