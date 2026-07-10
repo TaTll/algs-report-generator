@@ -353,7 +353,7 @@ function renderPanel(g){
   if (g !== "all") {
     h += '<div class="view-panel' + (playerMode === "radar" ? " active" : "") + '" id="pm-radar-' + g + '"><div class="radar-grid">';
     d.players.forEach(function(p, i) {
-      if (p.thumb) h += '<div class="radar-card" onclick="showDetail(' + JSON.stringify(g) + ',' + i + ')"><img src="' + p.thumb + ''" alt="' + p.name + '" loading="lazy"><div class="rname">' + p.name + '</div><div class="rteam">' + p.team + '</div></div>';
+      if (p.thumb) h += '<div class="radar-card" onclick="showDetail(' + JSON.stringify(g) + ',' + i + ')"><img src="' + p.thumb + '" alt="' + p.name + '" loading="lazy"><div class="rname">' + p.name + '</div><div class="rteam">' + p.team + '</div></div>';
     });
     h += '</div></div>';
   }
@@ -368,8 +368,8 @@ function renderPanel(g){
 
 function showDetail(g, idx) {
   var p = DATA[g].players[idx], h = '<div class="modal-header">';
-  if (p.thumb) h += '<img class="modal-radar" src="' + p.thumb + ''">';
-  if (p.photo) h += '<img class="modal-photo" src="' + p.photo + ''">';
+  if (p.thumb) h += '<img class="modal-radar" src="' + p.thumb + '">';
+  if (p.photo) h += '<img class="modal-photo" src="' + p.photo + '">';
   h += '<div class="modal-title"><h2>' + p.name + '</h2><div class="team">' + p.team + '</div></div></div>';
   h += '<div class="modal-stats">';
   var kd = p.kd || p.avg_kd || 0, kad = p.kad || p.avg_kad || 0, kp = p.kp || p.avg_kp || 0;
