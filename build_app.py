@@ -225,7 +225,7 @@ tr:hover td{background:#1a1a3e}
 .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:1000;justify-content:center;align-items:center}
 .modal-overlay.active{display:flex}
 .modal-box{background:#1a1a2e;border:2px solid #00d2ff;border-radius:16px;padding:24px;max-width:700px;width:95%;max-height:90vh;overflow-y:auto;position:relative;animation:fadeIn .25s}
-@keyframes fadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes fadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
 .modal-close{position:absolute;top:10px;right:16px;background:none;border:none;color:#888;font-size:26px;cursor:pointer}
 .modal-close:hover{color:#fff}
 .modal-header{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;margin-bottom:16px}
@@ -249,7 +249,7 @@ tr:hover td{background:#1a1a3e}
 <div class="header"><h1>ALGS Y6 Split1 Playoffs</h1><p>Player Stats · Team Rankings · Radar Charts</p></div>
 <div class="tabs" id="tabs"></div>
 <div class="subtabs" id="subtabs" style="display:none"></div>
-<div class="content" id="content"><div style="text-align:center;padding:60px;color:#888"><div style="font-size:40px;animation:spin 1s infinite linear">&#9696;</div><p style="margin-top:16px">Loading...</p></div></div>
+<div class="content" id="content"></div>
 <div class="modal-overlay" id="modal" onclick="if(event.target===this)hideModal()">
 <div class="modal-box" onclick="event.stopPropagation()">
 <button class="modal-close" onclick="hideModal()">&times;</button>
