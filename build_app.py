@@ -388,3 +388,13 @@ document.addEventListener("keydown", function(e) { if (e.key === "Escape") hideM
 </body>
 </html>
 '''
+html = html.replace("__JSON_PLACEHOLDER__", json_str)
+
+output_path = os.path.join(PUBLIC_DIR, "index.html")
+with open(output_path, "w", encoding="utf-8") as f:
+    f.write(html)
+html_kb = os.path.getsize(output_path) / 1024
+print(f"\nHTML: {html_kb:.0f} KB")
+print(f"Thumbs: {len(os.listdir(THUMBS_DIR))} files")
+print(f"Photos: {len(os.listdir(PHOTOS_DIR))} files")
+print(f"Output: {output_path}")
