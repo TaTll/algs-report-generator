@@ -108,6 +108,33 @@ for g, label in GROUPS.items():
 
 
 
+
+# ====== All Players (aggregated across all groups) ======
+from collections import defaultdict as _dd
+_ap = _dd(lambda: {"team": "", "group": set(), "kills": 0, "assists": 0, "dmg": 0, "games": 0, "match_count": 0, "kd_sum": 0, "kad_sum": 0, "kp_sum": 0})
+for _g in GROUPS:
+    _path = os.path.join(DATA_DIR, _g, "algs_players_data.csv")
+    if not os.path.exists(_path): continue
+    with open(_path, "r", encoding="utf-8-sig") as _f:
+        for _r in csv.DictReader(_f):
+            _n = _r["Player"]; _ap[_n]["team"] = _r.get("Team", ""); _ap[_n]["group"].add(_r.get("Group", ""))
+            _ap[_n]["kills"] += int(_r.get("Kills", "0") or "0"); _ap[_n]["assists"] += int(_r.get("Assists", "0") or "0")
+            _ap[_n]["dmg"] += int(_r.get("DmgDealt", "0") or "0"); _ap[_n]["games"] += int(_r.get("Games", "0") or "0")
+            _ap[_n]["match_count"] += 1
+            try: _ap[_n]["kd_sum"] += float(_r.get("KD", "0") or "0")
+            except: pass
+            try: _ap[_n]["kad_sum"] += float(_r.get("KAD", "0") or "0")
+            except: pass
+            try: _ap[_n]["kp_sum"] += float(_r.get("KillParticipationPct", "0") or "0")
+            except: pass
+_all_teams = _dd(lambda: {"kills": 0, "dmg": 0})
+_all_plist = []
+for _n, _d in _ap.items():
+    _mc = _d["match_count"]; _all_teams[_d["team"]]["kills"] += _d["kills"]; _all_teams[_d["team"]]["dmg"] += _d["dmg"]
+    _all_plist.append({"name": _n, "team": _d["team"], "groups": sorted(_d["group"]), "kills": _d["kills"], "assists": _d["assists"], "dmg": _d["dmg"], "games": _d["games"], "matches": _mc, "avg_kd": round(_d["kd_sum"]/_mc,2) if _mc else 0, "avg_kad": round(_d["kad_sum"]/_mc,2) if _mc else 0, "avg_kp": round(_d["kp_sum"]/_mc,1) if _mc else 0})
+_all_plist.sort(key=lambda x: x["dmg"], reverse=True)
+_all_tlist = [{"name": _t, "kills": _td["kills"], "dmg": _td["dmg"]} for _t, _td in sorted(_all_teams.items(), key=lambda x: x[1]["kills"], reverse=True)]
+all_data["all"] = {"label": "All Players", "player_count": len(_all_plist), "team_count": len(_all_teams), "groups": ["All"], "teams": _all_tlist, "players": _all_plist}
 # ====== Overall Standings ======
 all_data["overall"] = {
     "label": "Overall Standings",
@@ -247,7 +274,7 @@ function switchGroup(g){
 function renderPanel(g){
   var d=DATA[g], panel=document.getElementById("panel-"+g), h="";
 
-  // Special: Overall standings
+  // Special: Overall standings & All Players
   if(g==="overall"){
     h+='<div class="stats-bar"><div class="stat-box"><div class="num">'+d.team_count+'</div><div class="lbl">Teams</div></div>';
     h+='<div class="stat-box"><div class="num">14</div><div class="lbl">To Finals</div></div>';
