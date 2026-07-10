@@ -24,3 +24,4 @@ scripts/.feishu_config
 .DS_Store
 Thumbs.db
 public/radar_charts/
+docs/node_modules/
