@@ -77,20 +77,15 @@ var GROUPS = ["ab","ac","ad","bc","bd","cd","sf"];
 var GROUP_LABELS = {"sf":"Survivor","ab":"Day1 A vs B","ac":"Day2 A vs C","ad":"Day3 A vs D","bc":"Day3 B vs C","bd":"Day2 B vs D","cd":"Day1 C vs D"};
 
 (function init(){
-  var tabs=document.getElementById("tabs"), content=document.getElementById("content");
+  var tabs=document.getElementById("tabs"), subtabs=document.getElementById("subtabs"), content=document.getElementById("content");
   addTab("overall","Overall Standings");
   addTab("all","All Players");
-  var dd=document.createElement("div");dd.className="tab-dd";dd.id="group-dd";
-  var btn=document.createElement("button");btn.className="tab-btn";btn.textContent="Group Stage";btn.id="dd-btn";
-  btn.onclick=function(e){e.stopPropagation();dd.classList.toggle("open");};
-  tabs.appendChild(btn);
+  addTab("group","Group Stage");
   GROUPS.forEach(function(g){
-    var b=document.createElement("button");b.className="tab-btn dd-item";b.textContent=GROUP_LABELS[g];
-    b.onclick=function(e){e.stopPropagation();dd.classList.remove("open");switchGroup(g);};
-    dd.appendChild(b);
+    var b=document.createElement("button");b.className="tab-btn sub-item";b.textContent=GROUP_LABELS[g];
+    b.onclick=function(){switchGroup(g);};
+    subtabs.appendChild(b);
   });
-  tabs.appendChild(dd);
-  document.addEventListener("click",function(){dd.classList.remove("open");});
   ["overall","all"].concat(GROUPS).forEach(function(g){
     var p=document.createElement("div");p.className="tab-panel";p.id="panel-"+g;content.appendChild(p);
   });
@@ -104,13 +99,14 @@ function addTab(g,label){
 }
 
 function switchGroup(g){
-  document.querySelectorAll(".tab-btn:not(.dd-item)").forEach(function(b){
-    var match = b.textContent === DATA[g].label;
-    b.classList.toggle("active", match);
-  });
-  document.querySelectorAll(".tab-panel").forEach(function(p){
-    p.classList.toggle("active", p.id === "panel-" + g);
-  });
+  var isGroup=GROUPS.indexOf(g)>=0;
+  var subtabs=document.getElementById("subtabs");
+  if(g==="group"){subtabs.style.display="flex";switchGroup(GROUPS[0]);return;}
+  subtabs.style.display=isGroup?"flex":"none";
+  var topLabel=isGroup?"Group Stage":DATA[g].label;
+  document.querySelector("#tabs").querySelectorAll(".tab-btn").forEach(function(b){b.classList.toggle("active",b.textContent===topLabel);});
+  if(isGroup){document.querySelector("#subtabs").querySelectorAll(".tab-btn").forEach(function(b){b.classList.toggle("active",b.textContent===GROUP_LABELS[g]);});}
+  document.querySelectorAll(".tab-panel").forEach(function(p){p.classList.toggle("active",p.id==="panel-"+g);});
   renderPanel(g);
 }
 
