@@ -1,2 +1,0 @@
-2026-07-09 11:53:56.887 jianying_controller.py[235] switch_to_home -> Find Control Timeout(10s): {ClassName: 'TitleBarButton', ControlType: GroupControl}
-2026-07-09 11:54:09.935 jianying_controller.py[235] switch_to_home -> Find Control Timeout(10s): {ClassName: 'TitleBarButton', ControlType: GroupControl}
