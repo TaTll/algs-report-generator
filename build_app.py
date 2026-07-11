@@ -22,7 +22,7 @@ sys.path.insert(0, SCRIPTS_DIR)
 from team_utils import find_player_photo, get_team_abbr
 from PIL import Image
 
-GROUPS = {"ab": "Day1 A vs B", "ac": "Day2 A vs C", "bd": "Day2 B vs D", "bc": "Day3 B vs C", "ad": "Day3 A vs D", "cd": "Day1 C vs D"}
+GROUPS = {"ab": "Day1 A vs B", "ac": "Day2 A vs C", "bd": "Day2 B vs D", "bc": "Day3 B vs C", "ad": "Day3 A vs D", "cd": "Day1 C vs D", "sf": "Survivor Stage"}
 
 
 
@@ -257,8 +257,8 @@ tr:hover td{background:#1a1a3e}
 <script>
 var DATA = __JSON_PLACEHOLDER__;
 var playerMode = "list";
-var GROUPS = ["ab","ac","ad","bc","bd","cd"];
-var GROUP_LABELS = {"ab":"Day1 A vs B","ac":"Day2 A vs C","ad":"Day3 A vs D","bc":"Day3 B vs C","bd":"Day2 B vs D","cd":"Day1 C vs D"};
+var GROUPS = ["ab","ac","ad","bc","bd","cd","sf"];
+var GROUP_LABELS = {"sf":"Survivor","ab":"Day1 A vs B","ac":"Day2 A vs C","ad":"Day3 A vs D","bc":"Day3 B vs C","bd":"Day2 B vs D","cd":"Day1 C vs D"};
 
 (function init(){
   var tabs=document.getElementById("tabs"), content=document.getElementById("content");
