@@ -58,6 +58,13 @@ tr:nth-child(even):hover td{background:rgba(255,255,255,0.03)}
 .modal-stat .value{color:#e0e2e6;font-size:17px;font-weight:600;margin-top:2px}
 .modal-stat .value.hl{color:#c8942e}
 .player-row{cursor:pointer}
+th.sortable{cursor:pointer;user-select:none;position:relative}
+th.sortable:hover{color:#c8942e}
+th.sortable .arrow{display:inline-block;margin-left:4px;opacity:0;font-size:10px;transition:.15s}
+th.sortable:hover .arrow{opacity:0.4}
+th.sortable.asc .arrow,th.sortable.desc .arrow{opacity:1;color:#c8942e}
+th.sortable.asc .arrow::after{content:' ▲'}
+th.sortable.desc .arrow::after{content:' ▼'}
 @media(max-width:600px){.radar-grid{grid-template-columns:repeat(2,1fr)}.modal-radar{width:100%}.tabs{padding:0 8px}.tab-btn{padding:8px 10px;font-size:12px}}
 </style>
 </head>
@@ -111,6 +118,38 @@ function switchGroup(g){
   renderPanel(g);
 }
 
+
+function sortPlayers(g, col, th) {
+  if (sortCol === col) { sortAsc = !sortAsc; } else { sortCol = col; sortAsc = true; }
+  var d = DATA[g], players = d.players.slice();
+  var getVal = function(p) {
+    var v = p[col]; if (v === undefined || v === null) return 0;
+    if (typeof v === 'string' && v.indexOf('%') > -1) return parseFloat(v);
+    return parseFloat(v) || v;
+  };
+  players.sort(function(a, b) {
+    var va = getVal(a), vb = getVal(b);
+    if (typeof va === 'string') return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+    return sortAsc ? va - vb : vb - va;
+  });
+  // Update headers
+  th.parentNode.querySelectorAll('th').forEach(function(h, i) {
+    h.classList.remove('asc', 'desc');
+    if (h.dataset.col === col) h.classList.add(sortAsc ? 'asc' : 'desc');
+  });
+  // Rebuild tbody
+  var tbody = '', ph = g === "all" ? ["#","Player","Team","G","M","K","A","Dmg","K/D","KA/D","KP%"] : ["#","Player","Team","K","A","Dmg","K/D","KA/D","KP%"];
+  var cols = g === "all" ? [null,"name","team","games","matches","kills","assists","dmg","avg_kd","avg_kad","avg_kp"] : [null,"name","team","kills","assists","dmg","kd","kad","kp"];
+  players.forEach(function(p, i) {
+    tbody += '<tr class="player-row" onclick="showDetail(' + JSON.stringify(g) + ',' + d.players.indexOf(p) + ')"><td>' + (i + 1) + '</td>';
+    for (var ci = 1; ci < cols.length; ci++) {
+      var val = cols[ci] ? (p[cols[ci]] || '') : '';
+      tbody += '<td>' + (ci <= 2 ? '<strong>' + val + '</strong>' : val) + '</td>';
+    }
+    tbody += '</tr>';
+  });
+  th.closest('table').querySelector('tbody').innerHTML = tbody;
+}
 function renderPanel(g){
   var d = DATA[g], panel = document.getElementById("panel-" + g), h = "";
 
