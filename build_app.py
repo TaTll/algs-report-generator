@@ -191,58 +191,60 @@ html = r'''<!DOCTYPE html>
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ALGS Y6 Split1 Playoffs — Data Report v648256</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:#0a0a1a;color:#ccc}
-.header{background:linear-gradient(135deg,#0f0f2e,#1a1040);padding:20px;text-align:center;border-bottom:2px solid #1a1a4e}
-.header h1{color:#00d2ff;font-size:clamp(18px,4vw,26px)}
-.header p{color:#888;font-size:13px;margin-top:4px}
-.tabs{display:flex;justify-content:center;gap:6px;padding:14px 8px;flex-wrap:wrap}
-.tab-btn,.view-btn{background:#14142e;color:#888;border:1px solid #2a2a4e;padding:7px 16px;border-radius:18px;cursor:pointer;font-size:13px;transition:.2s}
-.tab-btn:hover,.view-btn:hover{color:#00d2ff;border-color:#00d2ff}
-.tab-btn.active,.view-btn.active{background:#00d2ff;color:#0a0a1a;border-color:#00d2ff;font-weight:bold}
-.view-bar{display:flex;justify-content:center;gap:8px;padding:0 16px 10px;flex-wrap:wrap}
-.sub-bar{display:flex;justify-content:center;gap:6px;padding:0 16px 8px}
-.content{max-width:1200px;margin:0 auto;padding:0 12px 40px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#14161a;color:#c8ccd4;line-height:1.5}
+.header{background:#1a1d23;border-bottom:1px solid #2a2d33;padding:16px 20px}
+.header h1{color:#e0e2e6;font-size:18px;font-weight:600;letter-spacing:-0.3px}
+.header p{color:#7a7f87;font-size:12px;margin-top:2px}
+.tabs{display:flex;gap:0;padding:0 20px;background:#1a1d23;border-bottom:1px solid #2a2d33;flex-wrap:wrap}
+.tab-btn{background:none;color:#7a7f87;border:none;padding:10px 16px;cursor:pointer;font-size:13px;border-bottom:2px solid transparent;transition:.15s;white-space:nowrap}
+.tab-btn:hover{color:#c8ccd4}
+.tab-btn.active{color:#e0e2e6;border-bottom-color:#c8942e}
+.subtabs{display:flex;gap:0;padding:0 20px;background:#1a1d23;border-bottom:1px solid #2a2d33;flex-wrap:wrap}
+.subtabs .tab-btn{font-size:12px;padding:8px 14px}
+.content{max-width:1100px;margin:0 auto;padding:20px}
 .tab-panel{display:none}.tab-panel.active{display:block}
 .view-panel{display:none}.view-panel.active{display:block}
-.stats-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
-.stat-box{background:#14142e;border:1px solid #2a2a4e;border-radius:10px;padding:10px 14px;flex:1;min-width:100px;text-align:center}
-.stat-box .num{color:#00d2ff;font-size:22px;font-weight:bold}
-.stat-box .lbl{color:#666;font-size:11px;margin-top:2px}
-.table-wrap{max-height:500px;overflow-y:auto;border:1px solid #1a1a4e;border-radius:8px}
+.stats-bar{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.stat-box{background:#1a1d23;border:1px solid #2a2d33;border-radius:4px;padding:14px 18px;flex:1;min-width:100px;text-align:center}
+.stat-box .num{color:#e0e2e6;font-size:24px;font-weight:600}
+.stat-box .lbl{color:#7a7f87;font-size:11px;margin-top:2px;text-transform:uppercase;letter-spacing:0.5px}
+.sec-title{color:#e0e2e6;font-size:16px;font-weight:600;margin-bottom:12px}
+.view-bar{display:flex;gap:4px;margin-bottom:14px}
+.view-btn{background:#1a1d23;color:#7a7f87;border:1px solid #2a2d33;padding:6px 14px;border-radius:3px;cursor:pointer;font-size:12px}
+.view-btn:hover{color:#c8ccd4;border-color:#3a3d43}
+.view-btn.active{background:#2a2d33;color:#e0e2e6;border-color:#3a3d43}
+.table-wrap{border:1px solid #2a2d33;border-radius:4px;overflow:hidden;margin-bottom:16px}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{background:#14142e;color:#00d2ff;padding:7px 8px;text-align:left;font-size:11px;position:sticky;top:0;z-index:1}
-td{padding:5px 8px;border-bottom:1px solid #1a1a4e}
-tr:hover td{background:#1a1a3e}
-.bar-wrap{width:80px;height:5px;background:#1a1a4e;border-radius:3px;display:inline-block;vertical-align:middle;margin-left:6px}
-.bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#00d2ff,#00ff88)}
-.radar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
-.radar-card{background:#14142e;border:1px solid #2a2a4e;border-radius:10px;padding:8px;text-align:center;cursor:pointer;transition:.2s}
-.radar-card:hover{border-color:#00d2ff;transform:translateY(-2px)}
-.radar-card img{width:100%;border-radius:6px;display:block;background:#0a0a1a}
-.radar-card .rname{color:#fff;font-size:13px;margin-top:4px;font-weight:bold}
-.radar-card .rteam{color:#888;font-size:11px}
-.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:1000;justify-content:center;align-items:center}
+th{background:#1a1d23;color:#9a9ea6;padding:8px 10px;text-align:left;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.3px;border-bottom:1px solid #2a2d33}
+td{padding:7px 10px;border-bottom:1px solid #1f2128;color:#c8ccd4}
+tr:hover td{background:rgba(255,255,255,0.02)}
+tr:nth-child(even) td{background:rgba(255,255,255,0.01)}
+tr:nth-child(even):hover td{background:rgba(255,255,255,0.03)}
+.radar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.radar-card{background:#1a1d23;border:1px solid #2a2d33;border-radius:4px;padding:8px;text-align:center;cursor:pointer;transition:.15s}
+.radar-card:hover{border-color:#3a3d43;background:#1f2128}
+.radar-card img{width:100%;border-radius:2px;display:block}
+.radar-card .rname{color:#e0e2e6;font-size:12px;margin-top:6px;font-weight:500}
+.radar-card .rteam{color:#7a7f87;font-size:11px}
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:1000;justify-content:center;align-items:center}
 .modal-overlay.active{display:flex}
-.modal-box{background:#1a1a2e;border:2px solid #00d2ff;border-radius:16px;padding:24px;max-width:700px;width:95%;max-height:90vh;overflow-y:auto;position:relative;animation:fadeIn .25s}
-@keyframes fadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
-.modal-close{position:absolute;top:10px;right:16px;background:none;border:none;color:#888;font-size:26px;cursor:pointer}
-.modal-close:hover{color:#fff}
-.modal-header{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;margin-bottom:16px}
-.modal-radar{width:260px;border-radius:10px;flex-shrink:0}
-.modal-photo{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #00d2ff;flex-shrink:0}
-.modal-title h2{color:#00d2ff;font-size:20px;margin-bottom:4px}
-.modal-title .team{color:#888;font-size:13px;margin-bottom:8px}
-.modal-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
-.modal-stat{background:#16213e;border-radius:8px;padding:10px 12px}
-.modal-stat .label{color:#888;font-size:10px;text-transform:uppercase}
-.modal-stat .value{color:#fff;font-size:18px;font-weight:bold;margin-top:2px}
-.modal-stat .value.hl{color:#00d2ff}
-.player-row{cursor:pointer}.player-row:hover{background:#1a1a3e!important}
-
-/* Sub-tabs for Group Stage */
-.subtabs{display:flex;justify-content:center;gap:4px;padding:4px 8px 10px;flex-wrap:wrap}
-@media(max-width:600px){.radar-grid{grid-template-columns:repeat(2,1fr)}.modal-radar{width:100%}}
+.modal-box{background:#1a1d23;border:1px solid #2a2d33;border-radius:8px;padding:24px;max-width:640px;width:95%;max-height:90vh;overflow-y:auto;position:relative;animation:fadeIn .2s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.modal-close{position:absolute;top:10px;right:14px;background:none;border:none;color:#7a7f87;font-size:22px;cursor:pointer}
+.modal-close:hover{color:#e0e2e6}
+.modal-header{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;margin-bottom:18px}
+.modal-radar{width:240px;border-radius:4px;flex-shrink:0}
+.modal-photo{width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid #2a2d33;flex-shrink:0}
+.modal-title h2{color:#e0e2e6;font-size:18px;font-weight:600;margin-bottom:2px}
+.modal-title .team{color:#7a7f87;font-size:12px}
+.modal-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.modal-stat{background:rgba(255,255,255,0.03);border:1px solid #2a2d33;border-radius:4px;padding:10px 12px}
+.modal-stat .label{color:#7a7f87;font-size:10px;text-transform:uppercase;letter-spacing:0.5px}
+.modal-stat .value{color:#e0e2e6;font-size:17px;font-weight:600;margin-top:2px}
+.modal-stat .value.hl{color:#c8942e}
+.player-row{cursor:pointer}
+@media(max-width:600px){.radar-grid{grid-template-columns:repeat(2,1fr)}.modal-radar{width:100%}.tabs{padding:0 8px}.tab-btn{padding:8px 10px;font-size:12px}}
 </style>
 </head>
 <body>
