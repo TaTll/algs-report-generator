@@ -200,8 +200,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .tab-btn{background:none;color:#7a7f87;border:none;padding:10px 16px;cursor:pointer;font-size:13px;border-bottom:2px solid transparent;transition:.15s;white-space:nowrap}
 .tab-btn:hover{color:#c8ccd4}
 .tab-btn.active{color:#e0e2e6;border-bottom-color:#c8942e}
-.subtabs{display:flex;gap:0;padding:0 20px;background:#1a1d23;border-bottom:1px solid #2a2d33;flex-wrap:wrap}
-.subtabs .tab-btn{font-size:12px;padding:8px 14px}
+.subtabs{display:flex;gap:2px;padding:6px 20px;background:#111316;border-bottom:1px solid #2a2d33;flex-wrap:wrap}
+.subtabs .tab-btn{font-size:11px;padding:5px 12px;border-bottom:none;border-radius:3px;border:1px solid transparent}.subtabs .tab-btn.active{background:#1a1d23;border-color:#2a2d33;color:#e0e2e6;border-bottom:none}
 .content{max-width:1100px;margin:0 auto;padding:20px}
 .tab-panel{display:none}.tab-panel.active{display:block}
 .view-panel{display:none}.view-panel.active{display:block}
