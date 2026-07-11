@@ -192,7 +192,8 @@ function renderPanel(g){
   h += '<div class="view-panel' + (playerMode === "list" ? " active" : "") + '" id="pm-list-' + g + '">';
   var ph = g === "all" ? ["#", "Player", "Team", "G", "M", "K", "A", "Dmg", "KD", "KAD", "KP%"] : ["#", "Player", "Team", "K", "A", "Dmg", "K/D", "KA/D", "KP%"];
   h += '<div class="table-wrap"><table><thead><tr>';
-  ph.forEach(function(x) { h += '<th>' + x + '</th>'; });
+  var cols = g === "all" ? [null,"name","team","games","matches","kills","assists","dmg","avg_kd","avg_kad","avg_kp"] : [null,"name","team","kills","assists","dmg","kd","kad","kp"];
+  ph.forEach(function(x, i) { var sc = cols[i]; h += '<th' + (sc ? ' class="sortable" data-col="' + sc + '" onclick="sortPlayers(\'' + g + '\',\'' + sc + '\',this)"' : '') + '>' + x + '<span class="arrow"></span></th>'; });
   h += '</tr></thead><tbody>';
   d.players.forEach(function(p, i) {
     h += '<tr class="player-row" onclick="showDetail(' + JSON.stringify(g) + ',' + i + ')"><td>' + (i + 1) + '</td><td><strong>' + p.name + '</strong></td><td>' + p.team + '</td>';
