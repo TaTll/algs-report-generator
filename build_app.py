@@ -305,37 +305,32 @@ function switchGroup(g){
 }
 
 
-function sortPlayers(g, col, th) {
+function sortTable(g, col, th) {
   if (sortCol === col) { sortAsc = !sortAsc; } else { sortCol = col; sortAsc = true; }
   var d = DATA[g], players = d.players.slice();
   var getVal = function(p) {
     var v = p[col]; if (v === undefined || v === null) return 0;
     if (typeof v === 'string' && v.indexOf('%') > -1) return parseFloat(v);
     var n = parseFloat(v);
-    return isNaN(n) ? (v || 0) : n;
+    return isNaN(n) ? 0 : n;
   };
   players.sort(function(a, b) {
     var va = getVal(a), vb = getVal(b);
-    if (typeof va === 'string') return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
     return sortAsc ? va - vb : vb - va;
   });
-  // Update headers
-  th.parentNode.querySelectorAll('th').forEach(function(h, i) {
+  th.parentNode.querySelectorAll('th').forEach(function(h) {
     h.classList.remove('asc', 'desc');
     if (h.dataset.col === col) h.classList.add(sortAsc ? 'asc' : 'desc');
   });
-  // Rebuild tbody
-  var tbody = '', ph = g === "all" ? ["#","Player","Team","G","M","K","A","Dmg","K/D","KA/D","KP%"] : ["#","Player","Team","K","A","Dmg","K/D","KA/D","KP%"];
-  var cols = g === "all" ? [null,"name","team","games","matches","kills","assists","dmg","avg_kd","avg_kad","avg_kp"] : [null,"name","team","kills","assists","dmg","kd","kad","kp"];
+  var tbody = th.closest('table').querySelector('tbody'), h = '';
+  var cols = g === 'all' ? [null,'name','team','games','matches','kills','assists','dmg','avg_kd','avg_kad','avg_kp'] : [null,'name','team','kills','assists','dmg','kd','kad','kp'];
   players.forEach(function(p, i) {
-    tbody += '<tr class="player-row" onclick="showDetail(' + JSON.stringify(g) + ',' + d.players.indexOf(p) + ')"><td>' + (i + 1) + '</td>';
-    for (var ci = 1; ci < cols.length; ci++) {
-      var val = cols[ci] ? (p[cols[ci]] || '') : '';
-      tbody += '<td>' + (ci <= 2 ? '<strong>' + val + '</strong>' : val) + '</td>';
-    }
-    tbody += '</tr>';
+    var ri = d.players.indexOf(p);
+    h += '<tr class="player-row" onclick="showDetail(' + JSON.stringify(g) + ',' + ri + ')"><td>' + (i + 1) + '</td><td><strong>' + p.name + '</strong></td><td>' + p.team + '</td>';
+    if (g === 'all') h += '<td>' + p.games + '</td><td>' + p.matches + '</td>';
+    h += '<td>' + p.kills + '</td><td>' + p.assists + '</td><td>' + p.dmg + '</td><td>' + (g === 'all' ? p.avg_kd : p.kd) + '</td><td>' + (g === 'all' ? p.avg_kad : p.kad) + '</td><td>' + (g === 'all' ? p.avg_kp : p.kp) + '%</td></tr>';
   });
-  th.closest('table').querySelector('tbody').innerHTML = tbody;
+  tbody.innerHTML = h;
 }
 function renderPanel(g){
   var d = DATA[g], panel = document.getElementById("panel-" + g), h = "";
@@ -380,7 +375,7 @@ function renderPanel(g){
   var ph = g === "all" ? ["#", "Player", "Team", "G", "M", "K", "A", "Dmg", "KD", "KAD", "KP%"] : ["#", "Player", "Team", "K", "A", "Dmg", "K/D", "KA/D", "KP%"];
   h += '<div class="table-wrap"><table><thead><tr>';
   var cols = g === "all" ? [null,"name","team","games","matches","kills","assists","dmg","avg_kd","avg_kad","avg_kp"] : [null,"name","team","kills","assists","dmg","kd","kad","kp"];
-  ph.forEach(function(x, i) { var sc = cols[i]; h += '<th' + (sc ? ' class="sortable" data-col="' + sc + '" onclick="sortPlayers(\'' + g + '\',\'' + sc + '\',this)"' : '') + '>' + x + '<span class="arrow"></span></th>'; });
+  ph.forEach(function(x, i) { var sc = cols[i]; h += '<th' + (sc ? ' class="sortable" data-col="' + sc + '" onclick="sortTable(\'' + g + '\',\'' + sc + '\',this)"' : '') + '>' + x + '<span class="arrow"></span></th>'; });
   h += '</tr></thead><tbody>';
   d.players.forEach(function(p, i) {
     h += '<tr class="player-row" onclick="showDetail(' + JSON.stringify(g) + ',' + i + ')"><td>' + (i + 1) + '</td><td><strong>' + p.name + '</strong></td><td>' + p.team + '</td>';
