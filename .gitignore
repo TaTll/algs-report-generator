@@ -25,3 +25,5 @@ scripts/.feishu_config
 Thumbs.db
 public/radar_charts/
 docs/node_modules/
+docs/node_modules/
+docs/radar_charts/
