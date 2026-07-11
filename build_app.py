@@ -259,20 +259,21 @@ tr:nth-child(even):hover td{background:rgba(255,255,255,0.03)}
 <script>
 var DATA = __JSON_PLACEHOLDER__;
 var playerMode = "list";
-var GROUPS = ["ab","ac","ad","bc","bd","cd","sf"];
-var GROUP_LABELS = {"sf":"Survivor","ab":"Day1 A vs B","ac":"Day2 A vs C","ad":"Day3 A vs D","bc":"Day3 B vs C","bd":"Day2 B vs D","cd":"Day1 C vs D"};
+var GROUPS = ["ab","ac","ad","bc","bd","cd"];
+var GROUP_LABELS = {"ab":"Day1 A vs B","ac":"Day2 A vs C","ad":"Day3 A vs D","bc":"Day3 B vs C","bd":"Day2 B vs D","cd":"Day1 C vs D"};
 
 (function init(){
   var tabs=document.getElementById("tabs"), subtabs=document.getElementById("subtabs"), content=document.getElementById("content");
   addTab("overall","Overall Standings");
   addTab("all","All Players");
   addTab("group","Group Stage");
+  addTab("sf","Survivor Stage");
   GROUPS.forEach(function(g){
     var b=document.createElement("button");b.className="tab-btn sub-item";b.textContent=GROUP_LABELS[g];
     b.onclick=function(){switchGroup(g);};
     subtabs.appendChild(b);
   });
-  ["overall","all"].concat(GROUPS).forEach(function(g){
+  ["overall","all","sf"].concat(GROUPS).forEach(function(g){
     var p=document.createElement("div");p.className="tab-panel";p.id="panel-"+g;content.appendChild(p);
   });
   switchGroup("overall");
