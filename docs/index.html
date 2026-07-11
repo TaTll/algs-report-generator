@@ -125,7 +125,8 @@ function sortPlayers(g, col, th) {
   var getVal = function(p) {
     var v = p[col]; if (v === undefined || v === null) return 0;
     if (typeof v === 'string' && v.indexOf('%') > -1) return parseFloat(v);
-    return parseFloat(v) || v;
+    var n = parseFloat(v);
+    return isNaN(n) ? (v || 0) : n;
   };
   players.sort(function(a, b) {
     var va = getVal(a), vb = getVal(b);
