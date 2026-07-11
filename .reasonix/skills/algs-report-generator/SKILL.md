@@ -1,66 +1,51 @@
 ---
 name: algs-report-generator
-description: 输入ApexLegendsStatus比赛URL，一键生成选手雷达图HTML画廊+MD数据报告+飞书通知+剪映工程+数据网站。支持Overview自动监控。自动爬取Liquipedia战队Logo和选手照片。
+description: 自然语言驱动 ALGS 赛事数据报告生成——说句话即可完成数据抓取、雷达图、画廊、MD报告、飞书推送、剪映工程、网站更新全流程。
 ---
 
 # ALGS 数据报告生成器
 
-## 🚀 一键更新
+## 使用方式
+
+直接用自然语言与 AI Agent 交互，无需手动执行脚本：
+
+```
+"更新 Survivor Stage 数据"
+"把 B vs D 组素材导入剪映"
+"网站加 Overall 排名"
+"补上 CD 组数据"
+```
+
+Agent 自主拆解 → 执行 → 验证 → 推送。
+
+## 输出
+
+| 产物 | 说明 |
+|------|------|
+| 雷达图 | 60 张六边形极坐标图 |
+| HTML 画廊 | 交互式，搜索+弹窗+照片 |
+| MD 报告 | Top 10 + 战队排名 |
+| 飞书通知 | 战绩卡片 + 数据预览 |
+| 剪映工程 | 三轨道 180 秒自动合成 |
+| 数据网站 | GitHub Pages，7 场比赛 |
+
+## 子脚本（Agent 自动调用）
+
+```
+scripts/
+├── generate_report.py      ← 主流程
+├── build_jy_video.py       ← 剪映工程
+├── update_all.py           ← 一键全更新
+└── team_utils.py           ← 战队映射 + 爬虫
+```
+
+## 依赖
 
 ```bash
-cd scripts
-
-# 抓取新比赛 + 建网站 + 推GitHub（全自动）
-python update_all.py --group ad --url "https://apexlegendsstatus.com/algs/Y6-Split1/ALGS-Playoffs/Global/Day3/AvD"
-
-# 已有CSV，只重建网站+推送
-python update_all.py --group ad --skip-fetch
-
-# 只重建网站+推送（不抓数据）
-python update_all.py --website-only
-```
-
-## ⚡ 子功能
-
-```bash
-# 生成剪映视频工程（三轨道：雷达图+照片+Logo）
-python build_jy_video.py --group ad
-
-# 爬取战队Logo+选手照片
-python -c "from team_utils import crawl_team_logos_and_photos; crawl_team_logos_and_photos()"
-
-# 自动监控 Overview
-python monitor_overview.py
-```
-
-## 📁 输出
-
-```
-data/{group}/
-├── algs_players_data.csv      ← 选手数据
-├── radar_charts/              ← 雷达图
-├── radar_gallery.html         ← 交互式画廊
-└── preview.md                 ← MD 报告
-
-public/  →  GitHub Pages       ← 数据网站
-```
-
-## 🖥️ 数据网站
-
-https://TaTll.github.io/algs-report-generator/
-
-- Tab 切换各组别
-- Team Data / Player Data 视图
-- List / Radar Charts 子视图
-- 点击弹窗：雷达图 + 选手照片 + 详细数据
-
-## 📮 飞书通知
-
-Webhook URL 保存至 `scripts/.feishu_config`，自动发送摘要卡片+MD数据预览。
-
-## 🔧 依赖
-
-```bash
-pip install "scrapling[all]>=0.4.10" beautifulsoup4 matplotlib pillow requests
+pip install scrapling[all] beautifulsoup4 matplotlib pillow requests
 scrapling install --force
 ```
+
+## 安全
+
+飞书 Webhook URL 保存在本地 `scripts/.feishu_config`，已 gitignore，不会上传。
