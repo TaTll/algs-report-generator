@@ -89,12 +89,13 @@ var GROUP_LABELS = {"ab":"Day1 A vs B","ac":"Day2 A vs C","ad":"Day3 A vs D","bc
   addTab("all","All Players");
   addTab("group","Group Stage");
   addTab("sf","Survivor Stage");
+  addTab("fn","Finals");
   GROUPS.forEach(function(g){
     var b=document.createElement("button");b.className="tab-btn sub-item";b.textContent=GROUP_LABELS[g];
     b.onclick=function(){switchGroup(g);};
     subtabs.appendChild(b);
   });
-  ["overall","all","sf"].concat(GROUPS).forEach(function(g){
+  ["overall","all","sf","fn"].concat(GROUPS).forEach(function(g){
     var p=document.createElement("div");p.className="tab-panel";p.id="panel-"+g;content.appendChild(p);
   });
   switchGroup("overall");

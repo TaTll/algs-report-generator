@@ -8,6 +8,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
+import matplotlib.patheffects as pe
 import numpy as np
 from math import pi
 
@@ -35,20 +36,55 @@ os.makedirs(OUT_DIR, exist_ok=True)
 
 # 6-axis radar chart: KillParticipationPct, DmgDealt, KAD, Kills, Assists, KD
 # Normalization: scale each metric to 0-100 for the radar
-RADAR_METRICS = [
-    ('KillParticipationPct', 'Kill\nParticipation%', 0, 100),
-    ('DmgDealt', 'Dmg\nDealt', 0, 12000),
-    ('KAD', 'KA/D', 0, 7),
-    ('Kills', 'Kills', 0, 20),
-    ('Assists', 'Assists', 0, 20),
-    ('KD', 'K/D', 0, 4),
+# hi 从数据动态计算（P75），让顶尖选手可以突破100%边界
+_METRIC_DEFS = [
+    ('KillParticipationPct', 'Kill\nParticipation%'),
+    ('DmgDealt', 'Dmg\nDealt'),
+    ('KAD', 'KA/D'),
+    ('Kills', 'Kills'),
+    ('Assists', 'Assists'),
+    ('KD', 'K/D'),
 ]
+
 
 def safe_float(val, default=0):
     try:
         return float(val)
     except (ValueError, TypeError):
         return default
+
+
+def _pctile(vals, p):
+    """计算列表的第 p 百分位数"""
+    if not vals:
+        return 0
+    s = sorted(vals)
+    k = (len(s) - 1) * p / 100.0
+    f = int(k)
+    c = k - f
+    if f + 1 < len(s):
+        return s[f] + c * (s[f + 1] - s[f])
+    return s[f]
+
+
+def _build_radar_metrics(players):
+    """根据选手数据动态计算每轴归一化上限：取排名第3的数值作为边界"""
+    metrics = []
+    for key, label in _METRIC_DEFS:
+        raw_vals = [safe_float(p.get(key, 0)) for p in players]
+        s = sorted(raw_vals)
+        hi = s[-3] if len(s) >= 3 else (s[-1] if s else 0)  # 第3高的值
+        lo = 0
+        # 避免 hi == lo 导致除零
+        if hi <= lo:
+            hi = lo + 1
+        metrics.append((key, label, lo, hi))
+        print(f"  雷达轴 {label.replace(chr(10),' ')}: lo={lo} hi={hi:.1f} (Top3边界)")
+    return metrics
+
+RADAR_METRICS = _build_radar_metrics(players)
+
+
 
 def make_radar_chart(player_data, output_path, avg_values=None):
     """Generate a hexagon radar chart for one player."""
@@ -57,7 +93,7 @@ def make_radar_chart(player_data, output_path, avg_values=None):
         raw_val = safe_float(player_data.get(key, 0))
         # Normalize to 0-100
         norm = ((raw_val - lo) / (hi - lo)) * 100 if hi > lo else 0
-        norm = max(0, min(100, norm))
+        norm = max(0, min(300, norm))  # 统一上限200%，超出圆形边界的部分自然溢出
         values.append(norm)
 
     # Close the polygon
@@ -71,32 +107,33 @@ def make_radar_chart(player_data, output_path, avg_values=None):
     fig, ax = plt.subplots(figsize=(8, 8), subplot_kw=dict(polar=True))
     fig.patch.set_facecolor('#1a1a2e')
     ax.set_facecolor('#1a1a2e')
+    ax.spines['polar'].set_linewidth(0.15)  # 外圈边框极细
 
-    # Draw hexagon grid
-    ax.set_ylim(0, 110)
-    ax.set_yticks([20, 40, 60, 80, 100])
-    ax.set_yticklabels(['20', '40', '60', '80', '100'], color='#666', size=10)
-    ax.yaxis.grid(True, color='#333', linestyle='-', linewidth=0.5)
+    # 统一边界200%，不显示参考网格线，数据六边形自由延伸
+    ax.set_ylim(0, 300)
+    ax.set_yticks([])  # 隐藏径向刻度
 
     # Draw axis lines with parameter names at the outer rim
     ax.set_xticks(angles)
-    ax.set_xticklabels(['KP%', 'Dmg', 'KA/D', 'Kills', 'Assists', 'K/D'],
-                       color='white', size=13, fontweight='bold')
-    # Shift labels outward so they sit around the chart
-    ax.tick_params(axis='x', pad=20)
+    labels = ax.set_xticklabels(['KP%', 'Dmg', 'KA/D', 'Kills', 'Assists', 'K/D'],
+                                color='white', size=13, fontweight='bold')
+    for label in labels:
+        label.set_path_effects([pe.withStroke(linewidth=4, foreground='#0f0f23')])
+        label.set_zorder(20)
+    ax.tick_params(axis='x', pad=40)
 
     # --- Average data (yellow hexagon) drawn first (behind player data) ---
     if avg_values:
         avg_closed = avg_values + [avg_values[0]]
-        ax.fill(angles_closed, avg_closed, alpha=0.25, color='#ffd700')
+        ax.fill(angles_closed, avg_closed, alpha=0.25, color='#ffd700', zorder=1)
         ax.plot(angles_closed, avg_closed, color='#ffd700', linewidth=2.5,
                 linestyle='--', marker='s', markersize=7,
-                markerfacecolor='#ffd700', markeredgecolor='white', markeredgewidth=1.5)
+                markerfacecolor='#ffd700', markeredgecolor='white', markeredgewidth=1.5, zorder=1)
 
-    # --- Player data (blue hexagon) drawn on top ---
-    ax.fill(angles_closed, values_closed, alpha=0.3, color='#00d2ff')
+    # --- Player data (blue hexagon) ---
+    ax.fill(angles_closed, values_closed, alpha=0.3, color='#00d2ff', zorder=2)
     ax.plot(angles_closed, values_closed, color='#00d2ff', linewidth=2.5, marker='o',
-            markersize=8, markerfacecolor='#00d2ff', markeredgecolor='white', markeredgewidth=1.5)
+            markersize=8, markerfacecolor='#00d2ff', markeredgecolor='white', markeredgewidth=1.5, zorder=2)
 
     # Title
     player_display = player_data.get('Player', 'Unknown')
@@ -124,7 +161,7 @@ for key, _, lo, hi in RADAR_METRICS:
     raw_vals = [safe_float(p.get(key, 0)) for p in players]
     avg_raw = sum(raw_vals) / len(raw_vals) if raw_vals else 0
     avg_norm = ((avg_raw - lo) / (hi - lo)) * 100 if hi > lo else 0
-    avg_norm = max(0, min(100, avg_norm))
+    avg_norm = max(0, min(300, avg_norm))  # 统一上限
     avg_values.append(avg_norm)
 print(f"\n平均雷达值: KP%={avg_values[0]:.0f} Dmg={avg_values[1]:.0f} KA/D={avg_values[2]:.0f} Kills={avg_values[3]:.0f} Assists={avg_values[4]:.0f} K/D={avg_values[5]:.0f}")
 
