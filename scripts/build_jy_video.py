@@ -6,8 +6,14 @@ ALGS 数据 → 剪映工程文件
 用法:
   python build_jy_video.py --group ac
   python build_jy_video.py --group bd --name "ALGS_BD_Group"
+  python build_jy_video.py --group fn --name "ALGS_Finals_Test_1" --limit 1
 """
 import os, sys, csv, re, argparse
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8")
 
 # ====== 环境初始化 ======
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -41,7 +47,7 @@ from team_utils import find_player_photo, get_team_abbr
 DURATION = "3s"
 
 
-def build_video(group, draft_name=None):
+def build_video(group, draft_name=None, limit=None, player_filter=None):
     """主流程：读取 CSV → 匹配素材 → 创建剪映工程"""
     group_dir = os.path.join(DATA_DIR, group)
     csv_path = os.path.join(group_dir, "algs_players_data.csv")
@@ -60,7 +66,15 @@ def build_video(group, draft_name=None):
         for row in csv.DictReader(f):
             players.append(row)
     players.sort(key=lambda p: (p.get('Team', ''), p.get('Player', '')))
+    if player_filter:
+        needle = player_filter.lower().strip()
+        players = [p for p in players if needle in p.get('Player', '').lower()]
+    if limit:
+        players = players[:limit]
     print(f"Players: {len(players)}")
+    if not players:
+        print("No players matched.")
+        return
 
     # 匹配素材
     player_assets = []
@@ -128,6 +142,8 @@ if __name__ == "__main__":
     parser.add_argument("--group", "-g", required=True, help="组别 (如 ac, bd, ab, cd)")
     parser.add_argument("--name", "-n", default=None, help="草稿名称 (默认 ALGS_{GROUP}_Group)")
     parser.add_argument("--duration", "-d", default="3s", help="每张图时长 (默认 3s)")
+    parser.add_argument("--limit", "-l", type=int, default=None, help="只导入前 N 名选手，用于小样测试")
+    parser.add_argument("--player", "-p", default=None, help="只导入名称包含该文本的选手")
     args = parser.parse_args()
     DURATION = args.duration
-    build_video(args.group, args.name)
+    build_video(args.group, args.name, limit=args.limit, player_filter=args.player)
