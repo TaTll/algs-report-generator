@@ -32,6 +32,8 @@ def get_match_title(csv_path=None, event_name="ALGS Y6 Split1 Playoffs"):
     """
     if csv_path is None:
         csv_path = os.path.join(DATA_DIR, 'algs_players_data.csv')
+
+    dataset_name = os.path.basename(os.path.dirname(os.path.abspath(csv_path))).lower()
     
     groups = set()
     player_count = 0
@@ -45,6 +47,11 @@ def get_match_title(csv_path=None, event_name="ALGS Y6 Split1 Playoffs"):
                 player_count += 1
     except Exception:
         return (f"{event_name}", f"{player_count} players")
+
+    if dataset_name == 'fn':
+        return f"{event_name} - Finals", f"Finals · {player_count} players"
+    if dataset_name == 'sf':
+        return f"{event_name} - Survivor Stage", f"Survivor Stage · {player_count} players"
     
     groups_sorted = sorted(groups)
     groups_str = ' vs '.join(groups_sorted)
@@ -166,6 +173,54 @@ FUZZY_TEAM_MAP = {
 
 # ====== 缓存：扫描 picture-ab 目录建立 player→abbr 反向索引 ======
 _player_abbr_cache = None
+_picture_files_cache = None
+
+
+def _list_picture_files():
+    """Return cached filenames from picture-ab to avoid repeated directory scans."""
+    global _picture_files_cache
+    if _picture_files_cache is not None:
+        return _picture_files_cache
+
+    if not os.path.isdir(PICTURE_DIR):
+        _picture_files_cache = []
+    else:
+        _picture_files_cache = os.listdir(PICTURE_DIR)
+    return _picture_files_cache
+
+
+def _is_usable_asset(path, min_size=5000):
+    """Small guard against placeholder/broken image assets."""
+    return os.path.exists(path) and os.path.getsize(path) > min_size
+
+
+def _find_asset_by_filename(filename):
+    """Case-insensitive lookup in picture-ab, returning an absolute path."""
+    filename_lower = filename.lower()
+    for existing in _list_picture_files():
+        if existing.lower() == filename_lower:
+            path = os.path.join(PICTURE_DIR, existing)
+            if _is_usable_asset(path):
+                return path
+    return None
+
+
+def _find_photo_by_abbr_and_player(team_abbr, player_name):
+    """Try direct player-photo filename patterns for one team abbreviation."""
+    if not team_abbr or not player_name:
+        return None
+
+    player_variants = {
+        player_name,
+        player_name.replace(' ', '_'),
+        re.sub(r'\s+', '_', player_name.strip()),
+    }
+    for player_variant in player_variants:
+        for ext in ['jpg', 'png', 'svg', 'jpeg']:
+            path = _find_asset_by_filename(f"{team_abbr}_{player_variant}.{ext}")
+            if path:
+                return path
+    return None
 
 def _build_player_cache():
     """扫描 picture-ab 目录，建立 player_name_lower → abbreviation 映射"""
@@ -177,13 +232,14 @@ def _build_player_cache():
     if not os.path.isdir(PICTURE_DIR):
         return _player_abbr_cache
     
-    for f in os.listdir(PICTURE_DIR):
+    for f in _list_picture_files():
         # Match: ABBR_PlayerID.ext (e.g. FLCN_ImperialHal.jpg)
         m = re.match(r'^([A-Z0-9]+(?:\.[A-Z0-9]+)?)_(.+?)\.(png|jpg|svg|jpeg)$', f, re.IGNORECASE)
         if m:
             abbr = m.group(1).upper()
             player_id = m.group(2)
             _player_abbr_cache[player_id.lower()] = abbr
+            _player_abbr_cache[player_id.replace('_', ' ').lower()] = abbr
     
     return _player_abbr_cache
 
@@ -235,16 +291,9 @@ def find_player_photo(player_name, team_name=None, team_abbr=None):
     
     # If we have team_abbr, try direct lookup first
     if team_abbr:
-        for ext in ['jpg', 'png', 'svg', 'jpeg']:
-            path = os.path.join(PICTURE_DIR, f"{team_abbr}_{player_name}.{ext}")
-            if os.path.exists(path) and os.path.getsize(path) > 5000:
-                return path, team_abbr
-        # Also try with underscores
-        player_underscored = player_name.replace(' ', '_')
-        for ext in ['jpg', 'png', 'svg', 'jpeg']:
-            path = os.path.join(PICTURE_DIR, f"{team_abbr}_{player_underscored}.{ext}")
-            if os.path.exists(path) and os.path.getsize(path) > 5000:
-                return path, team_abbr
+        path = _find_photo_by_abbr_and_player(team_abbr, player_name)
+        if path:
+            return path, team_abbr
     
     # If we have team_name, get abbr
     if not team_abbr and team_name:
@@ -258,22 +307,20 @@ def find_player_photo(player_name, team_name=None, team_abbr=None):
     # Exact player name match
     if player_normalized in cache:
         abbr = cache[player_normalized]
-        for ext in ['jpg', 'png', 'svg', 'jpeg']:
-            path = os.path.join(PICTURE_DIR, f"{abbr}_{player_name}.{ext}")
-            if os.path.exists(path) and os.path.getsize(path) > 5000:
-                return path, abbr
+        path = _find_photo_by_abbr_and_player(abbr, player_name)
+        if path:
+            return path, abbr
     
     # Fuzzy player name match
     for cached_name, abbr in cache.items():
         # Check if one contains the other
         if player_normalized in cached_name or cached_name in player_normalized:
             # Find the actual file
-            for ext in ['jpg', 'png', 'svg', 'jpeg']:
-                for fname in os.listdir(PICTURE_DIR):
-                    if fname.lower().startswith(abbr.lower() + '_') and cached_name in fname.lower():
-                        path = os.path.join(PICTURE_DIR, fname)
-                        if os.path.getsize(path) > 5000:
-                            return path, abbr
+            for fname in _list_picture_files():
+                if fname.lower().startswith(abbr.lower() + '_') and cached_name in fname.lower():
+                    path = os.path.join(PICTURE_DIR, fname)
+                    if _is_usable_asset(path):
+                        return path, abbr
     
     return None, None
 
@@ -293,7 +340,7 @@ def find_team_logo(team_name=None, team_abbr=None):
     
     for ext in ['png', 'jpg', 'svg']:
         path = os.path.join(PICTURE_DIR, f"{abbr}.{ext}")
-        if os.path.exists(path) and os.path.getsize(path) > 5000:
+        if _is_usable_asset(path):
             return path
     
     return None

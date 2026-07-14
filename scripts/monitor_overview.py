@@ -21,6 +21,21 @@ BASE_URL = "https://apexlegendsstatus.com"
 OVERVIEW_URL = f"{BASE_URL}/algs/Y6-Split1/ALGS-Playoffs/Global/Overview"
 
 
+def get_scrapling_cmd():
+    """Find Scrapling CLI from env, project venv, or PATH."""
+    configured = os.environ.get('SCRAPLING_BIN')
+    if configured:
+        return configured
+
+    exe_name = 'scrapling.exe' if os.name == 'nt' else 'scrapling'
+    project_dir = os.path.dirname(BASE_DIR)
+    local_bin = os.path.join(project_dir, '.venv', 'Scripts' if os.name == 'nt' else 'bin', exe_name)
+    if os.path.exists(local_bin):
+        return local_bin
+
+    return 'scrapling'
+
+
 def load_state():
     """加载已处理比赛记录"""
     if os.path.exists(STATE_FILE):
@@ -40,7 +55,7 @@ def fetch_overview():
     """抓取 Overview 页面 HTML"""
     html_path = os.path.join(DATA_DIR, '_overview_temp.html')
     cmd = [
-        'scrapling', 'extract', 'fetch', OVERVIEW_URL,
+        get_scrapling_cmd(), 'extract', 'fetch', OVERVIEW_URL,
         html_path, '--network-idle', '--timeout', '60000'
     ]
     result = subprocess.run(cmd, capture_output=True, text=True,

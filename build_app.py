@@ -22,12 +22,13 @@ sys.path.insert(0, SCRIPTS_DIR)
 from team_utils import find_player_photo, get_team_abbr
 from PIL import Image
 
-GROUPS = {"ab": "Day1 A vs B", "ac": "Day2 A vs C", "bd": "Day2 B vs D", "bc": "Day3 B vs C", "ad": "Day3 A vs D", "cd": "Day1 C vs D", "sf": "Survivor Stage"}
+GROUPS = {"ab": "Day1 A vs B", "ac": "Day2 A vs C", "bd": "Day2 B vs D", "bc": "Day3 B vs C", "ad": "Day3 A vs D", "cd": "Day1 C vs D"}
+DATASETS = {**GROUPS, "sf": "Survivor Stage", "fn": "Finals"}
 
 
 
 all_data = {}
-for g, label in GROUPS.items():
+for g, label in DATASETS.items():
     csv_path = os.path.join(DATA_DIR, g, "algs_players_data.csv")
     radar_dir = os.path.join(DATA_DIR, g, "radar_charts")
     if not os.path.exists(csv_path):
@@ -112,7 +113,7 @@ for g, label in GROUPS.items():
 # ====== All Players (aggregated across all groups) ======
 from collections import defaultdict as _dd
 _ap = _dd(lambda: {"team": "", "group": set(), "kills": 0, "assists": 0, "dmg": 0, "games": 0, "match_count": 0, "kd_sum": 0, "kad_sum": 0, "kp_sum": 0})
-for _g in GROUPS:
+for _g in DATASETS:
     _path = os.path.join(DATA_DIR, _g, "algs_players_data.csv")
     if not os.path.exists(_path): continue
     with open(_path, "r", encoding="utf-8-sig") as _f:

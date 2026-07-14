@@ -11,14 +11,28 @@ import os, sys, csv, re, argparse
 
 # ====== 环境初始化 ======
 current_dir = os.path.dirname(os.path.abspath(__file__))
-SKILL_ROOT = r"C:\Users\嘟嘟\AppData\Roaming\reasonix\skills\jianying-editor"
-if not os.path.exists(os.path.join(SKILL_ROOT, "scripts", "jy_wrapper.py")):
-    raise ImportError(f"JianYing skill not found at: {SKILL_ROOT}")
+BASE_DIR = os.path.dirname(current_dir)
+
+
+def find_jianying_skill_root():
+    """Support both the old Reasonix skill location and Codex-installed skills."""
+    candidates = [
+        os.environ.get("JY_SKILL_ROOT"),
+        os.path.join(os.environ.get("CODEX_HOME", os.path.expanduser("~/.codex")), "skills", "jianying-editor"),
+        r"C:\Users\嘟嘟\AppData\Roaming\reasonix\skills\jianying-editor",
+    ]
+    for root in candidates:
+        if root and os.path.exists(os.path.join(root, "scripts", "jy_wrapper.py")):
+            return root
+    checked = "\n  - ".join(str(c) for c in candidates if c)
+    raise ImportError(f"JianYing skill not found. Checked:\n  - {checked}")
+
+
+SKILL_ROOT = find_jianying_skill_root()
 
 sys.path.insert(0, os.path.join(SKILL_ROOT, "scripts"))
 from jy_wrapper import JyProject
 
-BASE_DIR = os.path.dirname(current_dir)
 DATA_DIR = os.path.join(BASE_DIR, "data")
 PHOTO_DIR = os.path.join(DATA_DIR, "picture-ab")
 sys.path.insert(0, os.path.join(BASE_DIR, "scripts"))

@@ -4,7 +4,7 @@
 用法: python generate_report.py <URL> --group bd
 示例: python generate_report.py "https://apexlegendsstatus.com/algs/Y6-Split1/ALGS-Playoffs/Global/Day2/BvD" --group bd
 
-流程: 抓取数据 → CSV → 雷达图 → HTML画廊 → PDF报告 → 飞书通知
+流程: 抓取数据 → CSV → 雷达图 → HTML画廊 → MD预览 → 飞书通知
 """
 import sys, os, re, csv, io, json, base64, argparse
 import requests
@@ -33,6 +33,20 @@ PICTURE_DIR = os.path.join(ROOT_DATA_DIR, 'picture-ab')
 DATA_DIR = os.environ.get('BH_DATA_DIR', ROOT_DATA_DIR)
 GROUP = None
 
+
+def get_scrapling_cmd():
+    """Find Scrapling CLI from env, project venv, or PATH."""
+    configured = os.environ.get('SCRAPLING_BIN')
+    if configured:
+        return configured
+
+    exe_name = 'scrapling.exe' if os.name == 'nt' else 'scrapling'
+    local_bin = os.path.join(os.path.dirname(BASE_DIR), '.venv', 'Scripts' if os.name == 'nt' else 'bin', exe_name)
+    if os.path.exists(local_bin):
+        return local_bin
+
+    return 'scrapling'
+
 # ====== 依赖检查 ======
 try:
     from bs4 import BeautifulSoup
@@ -59,7 +73,7 @@ def fetch_player_data(url):
     html_path = os.path.join(DATA_DIR, '_fetch_temp.html')
 
     cmd = [
-        'scrapling', 'extract', 'fetch', url,
+        get_scrapling_cmd(), 'extract', 'fetch', url,
         html_path,
         '--network-idle', '--timeout', '60000'
     ]
@@ -227,7 +241,7 @@ def generate_gallery_html():
 
 
 # ====== 6. 发送飞书 ======
-def send_to_feishu(gallery_path, md_path, player_count):
+def send_to_feishu(gallery_path, md_path, player_count, data_rows=None):
     """发送飞书通知：交互式卡片 + 小文件尝试上传，大文件提示路径"""
     if not WEBHOOK_URL:
         print("(未配置 FEISHU_WEBHOOK_URL，跳过飞书发送)")
@@ -235,9 +249,8 @@ def send_to_feishu(gallery_path, md_path, player_count):
     print("发送飞书通知...")
 
     # 收集报告摘要信息
-    teams = set()
-    for p in (data_rows if 'data_rows' in dir() else []):
-        teams.add(p.get('Team', ''))
+    data_rows = data_rows or []
+    teams = {p.get('Team', '') for p in data_rows if p.get('Team', '')}
     
     # 读取 CSV 获取小组信息
     groups = set()
@@ -267,12 +280,12 @@ def send_to_feishu(gallery_path, md_path, player_count):
                 {"tag": "hr"},
                 {
                     "tag": "div",
-                    "text": {"tag": "lark_md", "content": f"📁 **文件已生成**\n• 画廊: `data/{GROUP + '/' if GROUP else ''}radar_gallery.html`\n• PDF: `data/{GROUP + '/' if GROUP else ''}algs_report.pdf`\n• 雷达图: `data/{GROUP + '/' if GROUP else ''}radar_charts/` ({player_count}张)"}
+                    "text": {"tag": "lark_md", "content": f"📁 **文件已生成**\n• 画廊: `data/{GROUP + '/' if GROUP else ''}radar_gallery.html`\n• MD预览: `data/{GROUP + '/' if GROUP else ''}preview.md`\n• 雷达图: `data/{GROUP + '/' if GROUP else ''}radar_charts/` ({player_count}张)"}
                 },
                 {"tag": "hr"},
                 {
                     "tag": "note",
-                    "elements": [{"tag": "plain_text", "content": "PDF超过30KB限制，请从服务器获取。提供飞书App凭证可启用自动上传。"}]
+                    "elements": [{"tag": "plain_text", "content": "大文件请从本地目录或 GitHub Pages 获取。提供飞书 App 凭证可扩展为自动上传。"}]
                 }
             ]
         }
@@ -394,7 +407,7 @@ def main():
         if not WEBHOOK_URL:
             print("(提示: 设置环境变量 FEISHU_WEBHOOK_URL 即可自动发送飞书通知)")
         else:
-            send_to_feishu(gallery_path, md_path, len(data_rows))
+            send_to_feishu(gallery_path, md_path, len(data_rows), data_rows)
 
     print("\n" + "=" * 50)
     print("[OK] 全部完成!")
